@@ -7,6 +7,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +23,7 @@ import com.tomato.foodDel.dto.UserDto;
 import com.tomato.foodDel.entity.Role;
 import com.tomato.foodDel.entity.User;
 import com.tomato.foodDel.exception.DataExistsException;
+import com.tomato.foodDel.security.JwtUtil;
 import com.tomato.foodDel.service.AuthService;
 import com.tomato.foodDel.util.EmailSender;
 
@@ -30,10 +35,13 @@ public class AuthServiceImpl implements AuthService{
 	UserDao userDao;
 	PasswordEncoder encoder;
 	EmailSender emailSender;
+	AuthenticationManager authenticationManager;
+	UserDetailsService userDetailsService;
+	JwtUtil jwtUtil;
 	
 	@Override
 	public ResponseDto register(UserDto userDto) {
-	if (userDao.isEmailUnique(userDto.getEmail()) && userDao.isMobileUnique(userDto.getMobile())) {
+	if (userDao.isEmailAndMobileUnique(userDto.getEmail(),userDto.getMobile())) {
 		int otp = new Random().nextInt(100000, 1000000);
 		emailSender.sendOtp(userDto.getEmail(), otp, userDto.getName());
 		userDao.saveUser(
@@ -113,7 +121,15 @@ public class AuthServiceImpl implements AuthService{
 
 	@Override
 	public ResponseDto login(LoginDto loginDto) {
-		return new ResponseDto("Login Success", loginDto);
+		authenticationManager
+		.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+
+		UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getEmail());
+		String token = jwtUtil.generateToken(userDetails);
+		
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("token", token);
+		return new ResponseDto("Login Success", map);
 	}
 }
 

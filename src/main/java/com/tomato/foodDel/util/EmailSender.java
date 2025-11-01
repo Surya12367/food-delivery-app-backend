@@ -2,6 +2,7 @@ package com.tomato.foodDel.util;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ public class EmailSender {
 	
 	JavaMailSender mailSender;
 
+	@Async
 	public void sendOtp(String email, int otp, String name) {
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();
@@ -24,6 +26,7 @@ public class EmailSender {
 		}
 	}
 	
+	@Async
 	public void sendForgotOtp(String email, int otp, String name) {
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();

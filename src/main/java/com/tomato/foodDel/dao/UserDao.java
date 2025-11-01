@@ -29,5 +29,9 @@ public class UserDao {
 	public User findByEmail(String email) {
 		return userRepository.findByEmail(email).orElseThrow(()->new DataNotFoundException("Email Doesnot Exist"));
 	}
+	
+	public boolean isEmailAndMobileUnique(String email,Long mobile) {
+		return !userRepository.existsByEmailOrMobile(email,mobile);
+	}
 
 }

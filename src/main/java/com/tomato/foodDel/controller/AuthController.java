@@ -3,6 +3,7 @@ package com.tomato.foodDel.controller;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/user/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 	
 	AuthService authService;
