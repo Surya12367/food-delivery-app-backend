@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import com.tomato.foodDel.entity.User;
+import com.tomato.foodDel.exception.AccountNotVerifiedException;
 import com.tomato.foodDel.exception.DataNotFoundException;
 import com.tomato.foodDel.repository.UserRepository;
 
@@ -20,6 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService{
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		User user = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("Invalid Email"));
+		if (!user.isStatus()) {
+			throw new AccountNotVerifiedException("Account not verified. Please verify OTP.");
+		}
 		return new CustomUser(user);
 	}
 
